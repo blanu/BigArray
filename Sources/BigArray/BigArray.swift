@@ -165,6 +165,20 @@ extension BigArray: ExpressibleByArrayLiteral
 
 extension BigArray
 {
+    public func map(_ transform: (Element) throws -> Element) rethrows -> Self
+    {
+        var results: BigArray = BigArray()
+
+        for index in self.startIndex..<self.endIndex
+        {
+            let element = self[index]
+            let result = try transform(element)
+            results.append(result)
+        }
+
+        return results
+    }
+
     public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T]
     {
         var results: [T] = []
@@ -174,6 +188,23 @@ extension BigArray
             let element = self[index]
             let result = try transform(element)
             results.append(result)
+        }
+
+        return results
+    }
+
+    public func flatMap(_ transform: (Element) throws -> Self) rethrows -> Self
+    {
+        var results: BigArray = BigArray()
+
+        for index in self.startIndex..<self.endIndex
+        {
+            let element = self[index]
+            let segment = try transform(element)
+            for result in segment
+            {
+                results.append(result)
+            }
         }
 
         return results
@@ -196,9 +227,41 @@ extension BigArray
         return results
     }
 
+    func flatMap(_ transform: (Element) throws -> Element?) rethrows -> BigArray
+    {
+        var results: BigArray = BigArray()
+
+        for index in self.startIndex..<self.endIndex
+        {
+            let element = self[index]
+            if let result = try transform(element)
+            {
+                results.append(result)
+            }
+        }
+
+        return results
+    }
+
     func flatMap<ElementOfResult>(_ transform: (Self.Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult]
     {
         var results: [ElementOfResult] = []
+
+        for index in self.startIndex..<self.endIndex
+        {
+            let element = self[index]
+            if let result = try transform(element)
+            {
+                results.append(result)
+            }
+        }
+
+        return results
+    }
+
+    public func compactMap(_ transform: (Element) throws -> Element?) rethrows -> BigArray
+    {
+        var results: BigArray = BigArray()
 
         for index in self.startIndex..<self.endIndex
         {

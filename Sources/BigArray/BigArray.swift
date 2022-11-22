@@ -11,16 +11,13 @@ import BigNumber
 
 public struct BigArray: Equatable, Hashable, Codable
 {
-    public typealias Index = BInt
-
-    public var startIndex: BInt = BInt(0)
-
-    public var endIndex: BInt
+    public var startIndex: BigNum = .int(BInt(0))
+    public var endIndex: BigNum
     {
         switch self.multiarray
         {
             case .one(let array):
-                return BInt(array.count)
+                return .int(BInt(array.count))
 
             case .two(let array):
                 var result = BInt(0)
@@ -29,34 +26,36 @@ public struct BigArray: Equatable, Hashable, Codable
                     result += BInt(subarray.count)
                 }
 
-                return result
+                return .int(result)
         }
     }
 
-    var multiarray: Multiarray<BInt>
+    var multiarray: Multiarray<BigNum>
 
     public init()
     {
-        self.multiarray = Multiarray<BInt>.one([])
+        self.multiarray = Multiarray<BigNum>.one([])
     }
 }
 
 extension BigArray: Sequence
 {
-    public typealias Element = BInt
-    public typealias Iterator = MultiarrayIterator<BInt>
+    public typealias Element = BigNum
+    public typealias Iterator = MultiarrayIterator<Element>
 
-    public func makeIterator() ->  MultiarrayIterator<BInt>
+    public func makeIterator() ->  MultiarrayIterator<Element>
     {
-        return MultiarrayIterator<BInt>(self.multiarray)
+        return MultiarrayIterator<Element>(self.multiarray)
     }
 }
 
 extension BigArray: Collection
 {
-    public func index(after i: BInt) -> BInt
+    public typealias Index = BigNum
+
+    public func index(after i: BigNum) -> BigNum
     {
-        return i + 1
+        return .int(i.int! + 1)
     }
 
     public subscript(position: Index) -> Element
@@ -66,12 +65,12 @@ extension BigArray: Collection
             switch self.multiarray
             {
                 case .one(let array):
-                    let index = position.asInt()!
+                    let index = position.int!.asInt()!
                     return array[index]
 
                 case .two(let array):
-                    let index1 = (position / BInt(Int.max)).asInt()!
-                    let index2 = (position % BInt(Int.max)).asInt()!
+                    let index1 = (position.int! / BInt(Int.max)).asInt()!
+                    let index2 = (position.int! % BInt(Int.max)).asInt()!
                     let subarray = array[index1]
                     return subarray[index2]
             }
@@ -82,13 +81,13 @@ extension BigArray: Collection
             switch self.multiarray
             {
                 case .one(var array):
-                    let index = position.asInt()!
+                    let index = position.int!.asInt()!
                     array[index] = newValue
                     self.multiarray = .one(array)
 
                 case .two(var array):
-                    let index1 = (position / BInt(Int.max)).asInt()!
-                    let index2 = (position % BInt(Int.max)).asInt()!
+                    let index1 = (position.int! / BInt(Int.max)).asInt()!
+                    let index2 = (position.int! % BInt(Int.max)).asInt()!
                     var subarray = array[index1]
                     subarray[index2] = newValue
                     array[index1] = subarray
@@ -100,9 +99,9 @@ extension BigArray: Collection
 
 extension BigArray: BidirectionalCollection
 {
-    public func index(before i: BInt) -> BInt
+    public func index(before i: BigNum) -> BigNum
     {
-        return i - 1
+        return .int(i.int! - 1)
     }
 }
 
@@ -112,29 +111,29 @@ extension BigArray: MutableCollection
 
 extension BigArray: RandomAccessCollection
 {
-    public func index(_ i: BInt, offsetBy distance: Int) -> BInt
+    public func index(_ i: BigNum, offsetBy distance: Int) -> BigNum
     {
-        return i + BInt(distance)
+        return .int(i.int! + BInt(distance))
     }
 
-    public func distance(from start: BInt, to end: BInt) -> Int
+    public func distance(from start: BigNum, to end: BigNum) -> Int
     {
-        return (end - start).asInt()!
+        return (end.int! - start.int!).asInt()!
     }
 }
 
 extension BigArray: RangeReplaceableCollection
 {
-    mutating public func replaceSubrange<C>(_ subrange: Range<BInt>, with newElements: C) where C : Collection, BInt == C.Element
+    mutating public func replaceSubrange<C>(_ subrange: Range<BigNum>, with newElements: C) where C : Collection, BigNum == C.Element
     {
         switch self.multiarray
         {
             case .one(var array):
-                if subrange.upperBound <= BInt(Int.max)
+                if subrange.upperBound <= BigNum.int(BInt(Int.max))
                 {
                     // The size of the array is growing, but not enough to require an upgrade to .two.
 
-                    let intRange = subrange.lowerBound.asInt()!..<subrange.upperBound.asInt()!
+                    let intRange = subrange.lowerBound.int!.asInt()!..<subrange.upperBound.int!.asInt()!
                     array.replaceSubrange(intRange, with: newElements)
                     self.multiarray = .one(array)
                 }
@@ -152,7 +151,7 @@ extension BigArray: RangeReplaceableCollection
 
 extension BigArray: ExpressibleByArrayLiteral
 {
-    public init(arrayLiteral elements: BInt...)
+    public init(arrayLiteral elements: BigNum...)
     {
         self.init()
 
@@ -169,9 +168,9 @@ extension BigArray
     {
         var results: BigArray = BigArray()
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             let result = try transform(element)
             results.append(result)
         }
@@ -183,9 +182,9 @@ extension BigArray
     {
         var results: [T] = []
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             let result = try transform(element)
             results.append(result)
         }
@@ -197,9 +196,9 @@ extension BigArray
     {
         var results: BigArray = BigArray()
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             let segment = try transform(element)
             for result in segment
             {
@@ -214,9 +213,9 @@ extension BigArray
     {
         var results: [SegmentOfResult.Element] = []
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             let segment = try transform(element)
             for result in segment
             {
@@ -231,9 +230,9 @@ extension BigArray
     {
         var results: BigArray = BigArray()
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             if let result = try transform(element)
             {
                 results.append(result)
@@ -247,9 +246,9 @@ extension BigArray
     {
         var results: [ElementOfResult] = []
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             if let result = try transform(element)
             {
                 results.append(result)
@@ -263,9 +262,9 @@ extension BigArray
     {
         var results: BigArray = BigArray()
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             if let result = try transform(element)
             {
                 results.append(result)
@@ -279,9 +278,9 @@ extension BigArray
     {
         var results: [T] = []
 
-        for index in self.startIndex..<self.endIndex
+        for index in self.startIndex.int!..<self.endIndex.int!
         {
-            let element = self[index]
+            let element = self[BigNum.int(index)]
             if let result = try transform(element)
             {
                 results.append(result)

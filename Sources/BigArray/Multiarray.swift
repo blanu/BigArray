@@ -92,3 +92,19 @@ public struct MultiarrayIterator<T>: IteratorProtocol where T: Equatable, T: Has
         }
     }
 }
+
+extension Multiarray
+{
+    public func sorted(by f: (Element, Element) -> Bool) -> Self
+    {
+        switch self
+        {
+            case .one(let array):
+                return .one(array.sorted(by: f))
+
+            default:
+                // FIXME
+                return self
+        }
+    }
+}

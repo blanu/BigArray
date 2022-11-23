@@ -38,6 +38,11 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
     {
         self.multiarray = Multiarray<Element>.one([])
     }
+
+    public init(multiarray: Multiarray<Element>)
+    {
+        self.multiarray = multiarray
+    }
 }
 
 extension BigArray: Sequence
@@ -311,5 +316,13 @@ extension BigArray
         }
 
         return current
+    }
+}
+
+extension BigArray
+{
+    public func sorted(by f: (Element, Element) -> Bool) -> Self
+    {
+        return BigArray(self.multiarray.sorted(by: f))
     }
 }

@@ -232,6 +232,23 @@ extension BigArray
         return results
     }
 
+    public func flatMap<T>(_ transform: (Self.Element) throws -> BigArray<T>) rethrows -> BigArray<T> where T: AdditiveArithmetic
+    {
+        var results: BigArray<T> = BigArray<T>()
+
+        for index in self.startIndex..<self.endIndex
+        {
+            let element = self[index]
+            let segment = try transform(element)
+            for result in segment
+            {
+                results.append(result)
+            }
+        }
+
+        return results
+    }
+
     func flatMap(_ transform: (Element) throws -> Element?) rethrows -> BigArray
     {
         var results: BigArray = BigArray()

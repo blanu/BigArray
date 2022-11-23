@@ -165,9 +165,9 @@ extension BigArray: ExpressibleByArrayLiteral
 
 extension BigArray
 {
-    public func map(_ transform: (Element) throws -> Element) rethrows -> Self
+    public func map<T>(_ transform: (Element) throws -> T) rethrows -> BigArray<T> where T: Numeric
     {
-        var results: BigArray = BigArray()
+        var results: BigArray<T> = BigArray<T>()
 
         for index in self.startIndex..<self.endIndex
         {

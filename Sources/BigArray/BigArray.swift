@@ -9,8 +9,10 @@ import Foundation
 
 import BigNumber
 
-public struct BigArray<Numeric>: Equatable, Hashable, Codable
+public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equatable, T: Comparable, T: Hashable, T: Codable
 {
+    public typealias Element = T
+
     public var startIndex: BInt = BInt(0)
     public var endIndex: BInt
     {
@@ -30,17 +32,16 @@ public struct BigArray<Numeric>: Equatable, Hashable, Codable
         }
     }
 
-    var multiarray: Multiarray<BInt>
+    var multiarray: Multiarray<Element>
 
     public init()
     {
-        self.multiarray = Multiarray<BInt>.one([])
+        self.multiarray = Multiarray<Element>.one([])
     }
 }
 
 extension BigArray: Sequence
 {
-    public typealias Element = BInt
     public typealias Iterator = MultiarrayIterator<Element>
 
     public func makeIterator() ->  MultiarrayIterator<Element>
@@ -53,7 +54,7 @@ extension BigArray: Collection
 {
     public typealias Index = BInt
 
-    public func index(after i: BInt) -> BInt
+    public func index(after i: Index) -> Index
     {
         return i + 1
     }
@@ -99,7 +100,7 @@ extension BigArray: Collection
 
 extension BigArray: BidirectionalCollection
 {
-    public func index(before i: BInt) -> BInt
+    public func index(before i: Index) -> Index
     {
         return i - BInt(1)
     }
@@ -111,12 +112,12 @@ extension BigArray: MutableCollection
 
 extension BigArray: RandomAccessCollection
 {
-    public func index(_ i: BInt, offsetBy distance: Int) -> BInt
+    public func index(_ i: Index, offsetBy distance: Int) -> Index
     {
         return i + BInt(distance)
     }
 
-    public func distance(from start: BInt, to end: BInt) -> Int
+    public func distance(from start: Index, to end: Index) -> Int
     {
         return (end - start).asInt()!
     }
@@ -124,7 +125,7 @@ extension BigArray: RandomAccessCollection
 
 extension BigArray: RangeReplaceableCollection
 {
-    mutating public func replaceSubrange<C>(_ subrange: Range<BInt>, with newElements: C) where C : Collection, BInt == C.Element
+    mutating public func replaceSubrange<C>(_ subrange: Range<Self.Index>, with newElements: C) where C : Collection, Self.Element == C.Element
     {
         switch self.multiarray
         {
@@ -151,7 +152,7 @@ extension BigArray: RangeReplaceableCollection
 
 extension BigArray: ExpressibleByArrayLiteral
 {
-    public init(arrayLiteral elements: BInt...)
+    public init(arrayLiteral elements: Element...)
     {
         self.init()
 

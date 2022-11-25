@@ -32,16 +32,77 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
         }
     }
 
+    public var shape: BigArray<BInt>
+    {
+        if let internalShape = internalShape
+        {
+            return BigArray<BInt>(multiarray: internalShape)
+        }
+        else
+        {
+            return BigArray<BInt>()
+        }
+    }
+
+    public var tag: BigArray<BInt>
+    {
+        if let internalTag = internalTag
+        {
+            return BigArray<BInt>(multiarray: internalTag)
+        }
+        else
+        {
+            return BigArray<BInt>()
+        }
+    }
+
+    public var effect: BigArray<BInt>
+    {
+        if let internalEffect = internalEffect
+        {
+            return BigArray<BInt>(multiarray: internalEffect)
+        }
+        else
+        {
+            return BigArray<BInt>()
+        }
+    }
+
     var multiarray: Multiarray<Element>
+    var internalShape: Multiarray<BInt>?
+    var internalTag: Multiarray<BInt>?
+    var internalEffect: Multiarray<BInt>?
 
     public init()
     {
-        self.multiarray = Multiarray<Element>.one([])
+        self.init(multiarray: nil)
     }
 
-    public init(multiarray: Multiarray<Element>)
+    public init(multiarray: Multiarray<Element>? = nil, shape: Multiarray<BInt>? = nil, tag: Multiarray<BInt>? = nil, effect: Multiarray<BInt>? = nil)
     {
-        self.multiarray = multiarray
+        if let multiarray = multiarray
+        {
+            self.multiarray = multiarray
+        }
+        else
+        {
+            self.multiarray = Multiarray<Element>.one([])
+        }
+
+        if let shape = shape
+        {
+            self.internalShape = shape
+        }
+
+        if let tag = tag
+        {
+            self.internalTag = tag
+        }
+
+        if let effect = effect
+        {
+            self.internalEffect = effect
+        }
     }
 }
 

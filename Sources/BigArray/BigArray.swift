@@ -36,7 +36,12 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
     {
         if let internalShape = internalShape
         {
-            return BigArray<BInt>(multiarray: internalShape)
+            var array = BigArray<BInt>()
+            for int in internalShape
+            {
+                array.append(BInt(int))
+            }
+            return array
         }
         else
         {
@@ -69,7 +74,7 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
     }
 
     var multiarray: Multiarray<Element>
-    var internalShape: Multiarray<BInt>?
+    var internalShape: [Int]?
     var internalTag: Multiarray<BInt>?
     var internalEffect: Multiarray<BInt>?
 
@@ -91,7 +96,12 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
 
         if let shape = shape
         {
-            self.internalShape = shape
+            var shapeArray: [Int] = []
+            for bint in shape
+            {
+                shapeArray.append(bint.asInt()!)
+            }
+            self.internalShape = shapeArray
         }
 
         if let tag = tag

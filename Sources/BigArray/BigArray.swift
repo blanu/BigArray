@@ -16,20 +16,7 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
     public var startIndex: BInt = BInt(0)
     public var endIndex: BInt
     {
-        switch self.multiarray
-        {
-            case .one(let array):
-                return BInt(array.count)
-
-            case .two(let array):
-                var result = BInt(0)
-                for subarray in array
-                {
-                    result += BInt(subarray.count)
-                }
-
-                return result
-        }
+        return BInt(self.array.count)
     }
 
     public var shape: BigArray<BInt>
@@ -41,6 +28,7 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
             {
                 array.append(BInt(int))
             }
+
             return array
         }
         else
@@ -53,7 +41,7 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
     {
         if let internalTag = internalTag
         {
-            return BigArray<BInt>(multiarray: internalTag)
+            return BigArray<BInt>(array: internalTag)
         }
         else
         {
@@ -65,7 +53,7 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
     {
         if let internalEffect = internalEffect
         {
-            return BigArray<BInt>(multiarray: internalEffect)
+            return BigArray<BInt>(array: internalEffect)
         }
         else
         {
@@ -73,35 +61,30 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
         }
     }
 
-    var multiarray: Multiarray<Element>
+    var array: [Element]
     var internalShape: [Int]?
-    var internalTag: Multiarray<BInt>?
-    var internalEffect: Multiarray<BInt>?
+    var internalTag: [BInt]?
+    var internalEffect: [BInt]?
 
     public init()
     {
-        self.init(multiarray: nil)
+        self.init(array: nil)
     }
 
-    public init(multiarray: Multiarray<Element>? = nil, shape: Multiarray<BInt>? = nil, tag: Multiarray<BInt>? = nil, effect: Multiarray<BInt>? = nil)
+    public init(array: [Element]? = nil, shape: [Int]? = nil, tag: [BInt]? = nil, effect: [BInt]? = nil)
     {
-        if let multiarray = multiarray
+        if let array = array
         {
-            self.multiarray = multiarray
+            self.array = array
         }
         else
         {
-            self.multiarray = Multiarray<Element>.one([])
+            self.array = []
         }
 
         if let shape = shape
         {
-            var shapeArray: [Int] = []
-            for bint in shape
-            {
-                shapeArray.append(bint.asInt()!)
-            }
-            self.internalShape = shapeArray
+            self.internalShape = shape
         }
 
         if let tag = tag
@@ -118,11 +101,11 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
 
 extension BigArray: Sequence
 {
-    public typealias Iterator = MultiarrayIterator<Element>
+    public typealias Iterator = IndexingIterator<[Element]>
 
-    public func makeIterator() ->  MultiarrayIterator<Element>
+    public func makeIterator() -> Iterator
     {
-        return MultiarrayIterator<Element>(self.multiarray)
+        return self.array.makeIterator()
     }
 }
 
@@ -139,37 +122,14 @@ extension BigArray: Collection
     {
         get
         {
-            switch self.multiarray
-            {
-                case .one(let array):
-                    let index = position.asInt()!
-                    return array[index]
-
-                case .two(let array):
-                    let index1 = (position / BInt(Int.max)).asInt()!
-                    let index2 = (position % BInt(Int.max)).asInt()!
-                    let subarray = array[index1]
-                    return subarray[index2]
-            }
+            let index = position.asInt()!
+            return self.array[index]
         }
 
         set
         {
-            switch self.multiarray
-            {
-                case .one(var array):
-                    let index = position.asInt()!
-                    array[index] = newValue
-                    self.multiarray = .one(array)
-
-                case .two(var array):
-                    let index1 = (position / BInt(Int.max)).asInt()!
-                    let index2 = (position % BInt(Int.max)).asInt()!
-                    var subarray = array[index1]
-                    subarray[index2] = newValue
-                    array[index1] = subarray
-                    self.multiarray = .two(array)
-            }
+            let index = position.asInt()!
+            self.array[index] = newValue
         }
     }
 }
@@ -203,26 +163,8 @@ extension BigArray: RangeReplaceableCollection
 {
     mutating public func replaceSubrange<C>(_ subrange: Range<Self.Index>, with newElements: C) where C : Collection, Self.Element == C.Element
     {
-        switch self.multiarray
-        {
-            case .one(var array):
-                if subrange.upperBound <= BInt(Int.max)
-                {
-                    // The size of the array is growing, but not enough to require an upgrade to .two.
-
-                    let intRange = subrange.lowerBound.asInt()!..<subrange.upperBound.asInt()!
-                    array.replaceSubrange(intRange, with: newElements)
-                    self.multiarray = .one(array)
-                }
-                else
-                {
-                    // This size of the array is growing enough to require an upgrde to .two.
-                    return // FIXME
-                }
-
-            default:
-                return // FIXME
-        }
+        let intRange = subrange.lowerBound.asInt()!..<subrange.upperBound.asInt()!
+        self.array.replaceSubrange(intRange, with: newElements)
     }
 }
 
@@ -411,6 +353,6 @@ extension BigArray
 {
     public func sorted(by f: (Element, Element) -> Bool) -> Self
     {
-        return BigArray(self.multiarray.sorted(by: f))
+        return BigArray(self.array.sorted(by: f))
     }
 }

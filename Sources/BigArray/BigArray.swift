@@ -61,7 +61,7 @@ public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equ
         }
     }
 
-    var array: [Element]
+    public var array: [Element]
     var internalShape: [Int]?
     var internalTag: [BInt]?
     var internalEffect: [BInt]?

@@ -17,22 +17,49 @@ public indirect enum NestedArray<Element>
 
 extension NestedArray
 {
-    public func get(_ lens: NestedArrayLens) -> Element?
+    public var element: Element?
     {
         switch self
         {
-            case .element(let element):
+            case .element(let value):
+                return value
+
+            default:
+                return nil
+        }
+    }
+
+    public var array: [NestedArray<Element>]?
+    {
+        switch self
+        {
+            case .array(let value):
+                return value
+
+            default:
+                return nil
+        }
+    }
+}
+
+extension NestedArray
+{
+    public func get(_ lens: NestedArrayLens) -> NestedArray?
+    {
+        switch self
+        {
+            case .element:
                 guard lens.count == 0 else
                 {
                     return nil
                 }
 
-                return element
+                return self
 
             case .array(let array):
-                guard lens.count == 1 else
+                if lens.count == 0
                 {
-                    return nil
+                    return self
                 }
 
                 let rest = [Int](lens[1...])

@@ -9,7 +9,7 @@ import Foundation
 
 import BigNumber
 
-public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equatable, T: Comparable, T: Hashable, T: Codable
+public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equatable, T: Comparable, T: Hashable, T: Codable, T: HasOne, T: HasZero
 {
     public typealias Element = T
 
@@ -183,9 +183,9 @@ extension BigArray: ExpressibleByArrayLiteral
 
 extension BigArray
 {
-    public func map<T>(_ transform: (Element) throws -> T) rethrows -> BigArray<T> where T: Numeric
+    public func map<S>(_ transform: (Element) throws -> S) rethrows -> BigArray<S> where S: Numeric
     {
-        var results: BigArray<T> = BigArray<T>()
+        var results: BigArray<S> = BigArray<S>()
 
         for index in self.startIndex..<self.endIndex
         {
@@ -197,9 +197,9 @@ extension BigArray
         return results
     }
 
-    public func map<T>(_ transform: (Element) throws -> T) rethrows -> [T]
+    public func map<S>(_ transform: (Element) throws -> S) rethrows -> [S]
     {
-        var results: [T] = []
+        var results: [S] = []
 
         for index in self.startIndex..<self.endIndex
         {
@@ -245,9 +245,9 @@ extension BigArray
         return results
     }
 
-    public func flatMap<T>(_ transform: (Self.Element) throws -> BigArray<T>) rethrows -> BigArray<T> where T: AdditiveArithmetic
+    public func flatMap<S>(_ transform: (Self.Element) throws -> BigArray<S>) rethrows -> BigArray<S> where S: AdditiveArithmetic
     {
-        var results: BigArray<T> = BigArray<T>()
+        var results: BigArray<S> = BigArray<S>()
 
         for index in self.startIndex..<self.endIndex
         {
@@ -310,9 +310,9 @@ extension BigArray
         return results
     }
 
-    public func compactMap<T>(_ transform: (Element) throws -> T?) rethrows -> [T]
+    public func compactMap<S>(_ transform: (Element) throws -> S?) rethrows -> [S]
     {
-        var results: [T] = []
+        var results: [S] = []
 
         for index in self.startIndex..<self.endIndex
         {

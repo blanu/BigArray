@@ -9,7 +9,7 @@ import Foundation
 
 import BigNumber
 
-public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equatable, T: Comparable, T: Hashable, T: Codable, T: HasOne, T: HasZero
+public struct BigArray<T>: Equatable, Hashable, Codable where T: Numeric, T: Equatable, T: Comparable, T: Hashable, T: Codable, T: HasOne, T.OneType == T, T: HasZero, T.ZeroType == T
 {
     public typealias Element = T
 

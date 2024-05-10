@@ -53,6 +53,16 @@ extension BDouble: HasZero
     }
 }
 
+extension BDouble: HasOne
+{
+    public typealias OneType = Self
+
+    static public var one: Self
+    {
+        return 1
+    }
+}
+
 extension Int: HasOne
 {
     public typealias OneType = Self

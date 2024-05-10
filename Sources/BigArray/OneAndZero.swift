@@ -11,17 +11,23 @@ import BigNumber
 
 public protocol HasOne
 {
-    var one: any Numeric { get }
+    associatedtype OneType
+
+    var one: OneType { get }
 }
 
 public protocol HasZero
 {
-    var zero: any Numeric { get }
+    associatedtype ZeroType
+
+    var zero: ZeroType { get }
 }
 
 extension BInt: HasOne
 {
-    public var one: any Numeric
+    public typealias OneType = Self
+
+    public var one: Self
     {
         return BInt(1)
     }
@@ -29,7 +35,9 @@ extension BInt: HasOne
 
 extension BInt: HasZero
 {
-    public var zero: any Numeric
+    public typealias ZeroType = Self
+
+    public var zero: Self
     {
         return BInt(0)
     }

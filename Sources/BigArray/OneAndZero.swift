@@ -42,3 +42,23 @@ extension BInt: HasZero
         return BInt(0)
     }
 }
+
+extension BDouble: HasZero
+{
+    public typealias ZeroType = Self
+
+    static public var zero: Self
+    {
+        return BDouble(0)
+    }
+}
+
+extension BDouble: HasOne
+{
+    public typealias OneType = Self
+
+    static public var one: Self
+    {
+        return BDouble(1)
+    }
+}

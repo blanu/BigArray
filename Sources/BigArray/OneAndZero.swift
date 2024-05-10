@@ -13,21 +13,21 @@ public protocol HasOne
 {
     associatedtype OneType
 
-    var one: OneType { get }
+    static var one: OneType { get }
 }
 
 public protocol HasZero
 {
     associatedtype ZeroType
 
-    var zero: ZeroType { get }
+    static var zero: ZeroType { get }
 }
 
 extension BInt: HasOne
 {
     public typealias OneType = Self
 
-    public var one: Self
+    static public var one: Self
     {
         return BInt(1)
     }
@@ -37,7 +37,7 @@ extension BInt: HasZero
 {
     public typealias ZeroType = Self
 
-    public var zero: Self
+    static public var zero: Self
     {
         return BInt(0)
     }

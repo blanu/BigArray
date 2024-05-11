@@ -8,6 +8,7 @@
 import Foundation
 
 import BigNumber
+import Numerics
 
 public protocol HasOne
 {
@@ -81,4 +82,8 @@ extension Int: HasZero
     {
         return 0
     }
+}
+
+extension Complex: HasZero, HasOne
+{
 }
